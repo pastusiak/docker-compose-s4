@@ -4,7 +4,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - ${ENV_IP_NGINX}:${ENV_PORT_NGINX}:80
+      - ${NGINX_IP}:${NGINX_PORT}:80
     volumes:
       - ./config/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - .:/data
@@ -29,11 +29,11 @@ services:
   mysql:
     image: percona:5.7
     ports:
-      - ${ENV_PORT_MYSQL}:3306
+        - ${MYSQL_PORT}:3306
     tty: true
     restart: always
     volumes:
-      - ./var/docker_data/mysql:/var/lib/mysql
+        - mysql-data:/var/lib/mysql
     env_file:
       - .env
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -42,14 +42,18 @@ services:
       - app-network
 
   redis:
-    image: redis:5.0.3-alpine
-    volumes:
-      - ./var/docker_data/redis/data:/data
-    ports:
-      - ${ENV_PORT_REDIS}:6379
-    networks:
-      - app-network
+      image: redis:5.0.3-alpine
+      volumes:
+          - redis-data:/data
+      ports:
+          - ${REDIS_PORT}:6379
+      networks:
+          - app-network
+
+volumes:
+    mysql-data:
+    redis-data:
 
 networks:
-  app-network:
-    driver: bridge
+    app-network:
+        driver: bridge
